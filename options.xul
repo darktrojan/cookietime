@@ -13,6 +13,7 @@
 				<menuitem value="273" label="9 months" />
 				<menuitem value="365" label="12 months" />
 				<menuitem value="547" label="18 months" />
+				<menuitem value="0" label="Don't Delete" />
 			</menupopup>
 		</menulist>
 	</setting>
@@ -31,6 +32,7 @@
 				<menuitem value="730" label="2 years" />
 				<menuitem value="1095" label="3 years" />
 				<menuitem value="1825" label="5 years" />
+				<menuitem value="0" label="Don't Modify" />
 			</menupopup>
 		</menulist>
 	</setting>

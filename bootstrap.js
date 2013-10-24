@@ -18,6 +18,11 @@ Components.utils.import("resource://gre/modules/Promise.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/Sqlite.jsm");
 Components.utils.import("resource://gre/modules/Task.jsm");
+Components.utils.import("resource://gre/modules/PluralForm.jsm");
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyGetter(this, "strings", function() Services.strings.createBundle("chrome://cookietime/locale/cookietime.properties"));
+XPCOMUtils.defineLazyGetter(this, "getPlural", function() PluralForm.makeGetter(strings.GetStringFromName("pluralForm"))[0]);
 
 let optionsObserver = {
 	observe: function(aDocument, aTopic, aData) {
@@ -33,7 +38,7 @@ let optionsObserver = {
 				autoRunQueries().then(count => {
 					let deleted = count.deleteExpired + count.deleteUnused;
 					let modified = count.expire;
-					aDocument.defaultView.alert("Cookie Time deleted " + deleted + " cookies, and modified " + modified + ".");
+					aDocument.defaultView.alert(strings.formatStringFromName("message", [formatPlural(deleted), formatPlural(modified)], 2));
 					this.updateAffectedCounts(aDocument);
 				});
 			});
@@ -42,15 +47,15 @@ let optionsObserver = {
 
 	updateAffectedCounts: function(aDocument) {
 		countQueries().then(result => {
-			aDocument.getElementById("cookietime.deleteExpired.enabled").setAttribute("desc", result.deleteExpired + " cookies");
+			aDocument.getElementById("cookietime.deleteExpired.enabled").setAttribute("desc", formatPlural(result.deleteExpired));
 			let deleteUnusedItem = aDocument.getElementById("cookietime.deleteUnused.days").querySelector("menuitem");
 			for (let day in result.deleteUnused) {
-				deleteUnusedItem.setAttribute("description", result.deleteUnused[day] + " cookies");
+				deleteUnusedItem.setAttribute("description", formatPlural(result.deleteUnused[day]));
 				deleteUnusedItem = deleteUnusedItem.nextElementSibling;
 			}
 			let expireItem = aDocument.getElementById("cookietime.expire.days").querySelector("menuitem");
 			for (let day in result.expire) {
-				expireItem.setAttribute("description", result.expire[day] + " cookies");
+				expireItem.setAttribute("description", formatPlural(result.expire[day]));
 				expireItem = expireItem.nextElementSibling;
 			}
 		});
@@ -93,15 +98,26 @@ function autoRunQueries() {
 		let count = yield countQueries();
 		yield runQueries(deleteExpired, deleteUnusedDays, expireDays);
 
-		increaseCount(PREF_DELETE_EXPIRED_COUNT, count.deleteExpired);
-		increaseCount(PREF_DELETE_UNUSED_COUNT, count.deleteUnused[deleteUnusedDays]);
-		increaseCount(PREF_EXPIRE_COUNT, count.expire[expireDays]);
+		let result = {
+			deleteExpired: 0,
+			deleteUnused: 0,
+			expire: 0
+		};
 
-		deferred.resolve({
-			deleteExpired: count.deleteExpired,
-			deleteUnused: count.deleteUnused[deleteUnusedDays],
-			expire: count.expire[expireDays]
-		});
+		if (deleteExpired) {
+			increaseCount(PREF_DELETE_EXPIRED_COUNT, count.deleteExpired);
+			result.deleteUnused = count.deleteExpired;
+		}
+		if (deleteUnusedDays) {
+			increaseCount(PREF_DELETE_UNUSED_COUNT, count.deleteUnused[deleteUnusedDays]);
+			result.deleteUnused = count.deleteUnused[deleteUnusedDays];
+		}
+		if (expireDays) {
+			increaseCount(PREF_EXPIRE_COUNT, count.expire[expireDays]);
+			result.expire = count.expire[expireDays];
+		}
+
+		deferred.resolve(result);
 	});
 	return deferred.promise;
 }
@@ -179,4 +195,9 @@ function runQueries(aDeleteExpired, aDeleteUnusedDays, aExpireDays) {
 function increaseCount(aPref, aCount) {
 	let count = Services.prefs.getIntPref(PREF_BRANCH + aPref);
 	Services.prefs.setIntPref(PREF_BRANCH + aPref, count + aCount);
+}
+
+function formatPlural(aCount, aKey="cookieCount") {
+	let formats = strings.GetStringFromName(aKey);
+	return getPlural(aCount, formats).replace("%S", aCount);
 }
