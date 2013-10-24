@@ -1,0 +1,19 @@
+<!ENTITY cookietime.deleteExpired.enabled-title "Delete Expired Cookies">
+<!ENTITY cookietime.deleteUnused.days-title "Delete Cookies Unused For">
+<!ENTITY cookietime.deleteUnused.days-nodelete "Don't Delete">
+<!ENTITY cookietime.expire.days-title "All Cookies Expire Within">
+<!ENTITY cookietime.expire.days-nomodify "Don't Modify">
+<!ENTITY cookietime.runnow.label "Run Now">
+
+<!ENTITY cookietime.interval.7 "1 week">
+<!ENTITY cookietime.interval.14 "2 weeks">
+<!ENTITY cookietime.interval.30 "1 month">
+<!ENTITY cookietime.interval.60 "2 months">
+<!ENTITY cookietime.interval.91 "3 months">
+<!ENTITY cookietime.interval.182 "6 months">
+<!ENTITY cookietime.interval.273 "9 months">
+<!ENTITY cookietime.interval.365 "12 months">
+<!ENTITY cookietime.interval.547 "18 months">
+<!ENTITY cookietime.interval.730 "2 years">
+<!ENTITY cookietime.interval.1095 "3 years">
+<!ENTITY cookietime.interval.1825 "5 years">

@@ -1,42 +1,43 @@
 <?xml version="1.0" ?>
+<!DOCTYPE settings SYSTEM "chrome://cookietime/locale/cookietime.dtd">
 <settings xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-	<setting id="cookietime.deleteExpired.enabled" pref="extensions.cookietime.deleteExpired.enabled" title="Delete Expired Cookies" type="bool" />
-	<setting id="cookietime.deleteUnused.days" pref="extensions.cookietime.deleteUnused.days" title="Delete Cookies Unused For" type="menulist">
+	<setting id="cookietime.deleteExpired.enabled" pref="extensions.cookietime.deleteExpired.enabled" title="&cookietime.deleteExpired.enabled-title;" type="bool" />
+	<setting id="cookietime.deleteUnused.days" pref="extensions.cookietime.deleteUnused.days" title="&cookietime.deleteUnused.days-title;" type="menulist">
 		<menulist sizetopopup="always">
 			<menupopup>
-				<menuitem value="7" label="1 week" />
-				<menuitem value="14" label="2 weeks" />
-				<menuitem value="30" label="1 month" />
-				<menuitem value="60" label="2 months" />
-				<menuitem value="91" label="3 months" />
-				<menuitem value="182" label="6 months" />
-				<menuitem value="273" label="9 months" />
-				<menuitem value="365" label="12 months" />
-				<menuitem value="547" label="18 months" />
-				<menuitem value="0" label="Don't Delete" />
+				<menuitem value="7" label="&cookietime.interval.7;" />
+				<menuitem value="14" label="&cookietime.interval.14;" />
+				<menuitem value="30" label="&cookietime.interval.30;" />
+				<menuitem value="60" label="&cookietime.interval.60;" />
+				<menuitem value="91" label="&cookietime.interval.91;" />
+				<menuitem value="182" label="&cookietime.interval.182;" />
+				<menuitem value="273" label="&cookietime.interval.273;" />
+				<menuitem value="365" label="&cookietime.interval.365;" />
+				<menuitem value="547" label="&cookietime.interval.547;" />
+				<menuitem value="0" label="&cookietime.deleteUnused.days-nodelete;" />
 			</menupopup>
 		</menulist>
 	</setting>
-	<setting id="cookietime.expire.days" pref="extensions.cookietime.expire.days" title="All Cookies Expire Within" type="menulist">
+	<setting id="cookietime.expire.days" pref="extensions.cookietime.expire.days" title="&cookietime.expire.days-title;" type="menulist">
 		<menulist sizetopopup="always">
 			<menupopup>
-				<menuitem value="7" label="1 week" />
-				<menuitem value="14" label="2 weeks" />
-				<menuitem value="30" label="1 month" />
-				<menuitem value="60" label="2 months" />
-				<menuitem value="91" label="3 months" />
-				<menuitem value="182" label="6 months" />
-				<menuitem value="273" label="9 months" />
-				<menuitem value="365" label="12 months" />
-				<menuitem value="547" label="18 months" />
-				<menuitem value="730" label="2 years" />
-				<menuitem value="1095" label="3 years" />
-				<menuitem value="1825" label="5 years" />
-				<menuitem value="0" label="Don't Modify" />
+				<menuitem value="7" label="&cookietime.interval.7;" />
+				<menuitem value="14" label="&cookietime.interval.14;" />
+				<menuitem value="30" label="&cookietime.interval.30;" />
+				<menuitem value="60" label="&cookietime.interval.60;" />
+				<menuitem value="91" label="&cookietime.interval.91;" />
+				<menuitem value="182" label="&cookietime.interval.182;" />
+				<menuitem value="273" label="&cookietime.interval.273;" />
+				<menuitem value="365" label="&cookietime.interval.365;" />
+				<menuitem value="547" label="&cookietime.interval.547;" />
+				<menuitem value="730" label="&cookietime.interval.730;" />
+				<menuitem value="1095" label="&cookietime.interval.1095;" />
+				<menuitem value="1825" label="&cookietime.interval.1825;" />
+				<menuitem value="0" label="&cookietime.expire.days-nomodify;" />
 			</menupopup>
 		</menulist>
 	</setting>
 	<setting type="control">
-		<button id="cookietime.runnow" label="Run Now" />
+		<button id="cookietime.runnow" label="&cookietime.runnow.label;" />
 	</setting>
 </settings>
