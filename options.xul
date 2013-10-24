@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<settings xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<setting id="cookietime.deleteExpired.enabled" pref="extensions.cookietime.deleteExpired.enabled" title="Delete Expired Cookies" type="bool" />
+	<setting id="cookietime.deleteUnused.days" pref="extensions.cookietime.deleteUnused.days" title="Delete Cookies Unused For" type="menulist">
+		<menulist sizetopopup="always">
+			<menupopup>
+				<menuitem value="7" label="1 week" />
+				<menuitem value="14" label="2 weeks" />
+				<menuitem value="30" label="1 month" />
+				<menuitem value="60" label="2 months" />
+				<menuitem value="91" label="3 months" />
+				<menuitem value="182" label="6 months" />
+				<menuitem value="273" label="9 months" />
+				<menuitem value="365" label="12 months" />
+				<menuitem value="547" label="18 months" />
+			</menupopup>
+		</menulist>
+	</setting>
+	<setting id="cookietime.expire.days" pref="extensions.cookietime.expire.days" title="All Cookies Expire Within" type="menulist">
+		<menulist sizetopopup="always">
+			<menupopup>
+				<menuitem value="7" label="1 week" />
+				<menuitem value="14" label="2 weeks" />
+				<menuitem value="30" label="1 month" />
+				<menuitem value="60" label="2 months" />
+				<menuitem value="91" label="3 months" />
+				<menuitem value="182" label="6 months" />
+				<menuitem value="273" label="9 months" />
+				<menuitem value="365" label="12 months" />
+				<menuitem value="547" label="18 months" />
+				<menuitem value="730" label="2 years" />
+				<menuitem value="1095" label="3 years" />
+				<menuitem value="1825" label="5 years" />
+			</menupopup>
+		</menulist>
+	</setting>
+	<setting type="control">
+		<button id="cookietime.runnow" label="Run Now" />
+	</setting>
+</settings>
