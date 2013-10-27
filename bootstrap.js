@@ -106,7 +106,7 @@ function autoRunQueries() {
 
 		if (deleteExpired) {
 			increaseCount(PREF_DELETE_EXPIRED_COUNT, count.deleteExpired);
-			result.deleteUnused = count.deleteExpired;
+			result.deleteExpired = count.deleteExpired;
 		}
 		if (deleteUnusedDays) {
 			increaseCount(PREF_DELETE_UNUSED_COUNT, count.deleteUnused[deleteUnusedDays]);
