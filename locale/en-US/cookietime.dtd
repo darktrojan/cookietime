@@ -4,6 +4,8 @@
 <!ENTITY cookietime.expire.days-title "All Cookies Expire Within">
 <!ENTITY cookietime.expire.days-nomodify "Don't Modify">
 <!ENTITY cookietime.runnow.label "Run Now">
+<!ENTITY cookietime.idle.enabled-title "Run Automatically">
+<!ENTITY cookietime.idle.enabled-desc "Runs about once a day when idle">
 
 <!ENTITY cookietime.interval.7 "1 week">
 <!ENTITY cookietime.interval.14 "2 weeks">

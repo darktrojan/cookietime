@@ -7,6 +7,7 @@ const PREF_DELETE_UNUSED_COUNT = "deleteUnused.count";
 const PREF_DELETE_UNUSED_DAYS = "deleteUnused.days";
 const PREF_EXPIRE_COUNT = "expire.count";
 const PREF_EXPIRE_DAYS = "expire.days";
+const PREF_IDLE_ENABLED = "idle.enabled";
 
 const SECONDS_IN_DAY = 86400;
 const US_IN_SECOND = 1000000;
@@ -62,6 +63,25 @@ let optionsObserver = {
 	}
 };
 
+let idleObserver = {
+	observe: function(aSubject, aTopic, aData) {
+		switch(aTopic) {
+		case "cookietime-idle":
+		case "idle-daily":
+			if (Services.prefs.getBoolPref(PREF_BRANCH + PREF_IDLE_ENABLED)) {
+				autoRunQueries().then(count => {
+					let deleted = count.deleteExpired + count.deleteUnused;
+					let modified = count.expire;
+					Services.console.logStringMessage(aTopic + ": " + strings.formatStringFromName("message", [formatPlural(deleted), formatPlural(modified)], 2));
+				});
+			} else if (aTopic == "cookietime-idle") {
+				Services.console.logStringMessage(aTopic + ": " + strings.GetStringFromName("idle-disabled"));
+			}
+			break;
+		}
+	}
+};
+
 function install(aParams, aReason) {
 }
 
@@ -76,16 +96,21 @@ function startup(aParams, aReason) {
 	defaultPrefs.setIntPref(PREF_DELETE_UNUSED_DAYS, 90);
 	defaultPrefs.setIntPref(PREF_EXPIRE_COUNT, 0);
 	defaultPrefs.setIntPref(PREF_EXPIRE_DAYS, 90);
+	defaultPrefs.setBoolPref(PREF_IDLE_ENABLED, false);
 
 	if (aReason = ADDON_INSTALL) {
 		// TODO show config UI
 	}
 
 	Services.obs.addObserver(optionsObserver, "addon-options-displayed", false);
+	Services.obs.addObserver(idleObserver, "idle-daily", false);
+	Services.obs.addObserver(idleObserver, "cookietime-idle", false);
 }
 
 function shutdown(aParams, aReason) {
 	Services.obs.removeObserver(optionsObserver, "addon-options-displayed");
+	Services.obs.removeObserver(idleObserver, "idle-daily", false);
+	Services.obs.removeObserver(idleObserver, "cookietime-idle", false);
 }
 
 function autoRunQueries() {

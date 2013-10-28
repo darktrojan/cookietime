@@ -37,6 +37,7 @@
 			</menupopup>
 		</menulist>
 	</setting>
+	<setting desc="&cookietime.idle.enabled-desc;" pref="extensions.cookietime.idle.enabled" title="&cookietime.idle.enabled-title;" type="bool" />
 	<setting type="control">
 		<button id="cookietime.runnow" label="&cookietime.runnow.label;" />
 	</setting>
