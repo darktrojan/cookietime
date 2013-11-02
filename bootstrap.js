@@ -8,8 +8,10 @@ const PREF_DELETE_UNUSED_DAYS = "deleteUnused.days";
 const PREF_EXPIRE_COUNT = "expire.count";
 const PREF_EXPIRE_DAYS = "expire.days";
 const PREF_IDLE_ENABLED = "idle.enabled";
+const PREF_IDLE_LASTRAN = "idle.lastran";
 
 const SECONDS_IN_DAY = 86400;
+const MS_IN_SECOND = 1000;
 const US_IN_SECOND = 1000000;
 
 const DAY_INCREMENTS_SHORT = [7, 14, 30, 60, 91, 182, 273, 365, 547];
@@ -72,6 +74,7 @@ let idleObserver = {
 				autoRunQueries().then(count => {
 					let deleted = count.deleteExpired + count.deleteUnused;
 					let modified = count.expire;
+					Services.prefs.setIntPref(PREF_BRANCH + PREF_IDLE_LASTRAN, Math.floor(Date.now() / MS_IN_SECOND));
 					Services.console.logStringMessage(aTopic + ": " + strings.formatStringFromName("message", [formatPlural(deleted), formatPlural(modified)], 2));
 				});
 			} else if (aTopic == "cookietime-idle") {
