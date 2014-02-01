@@ -1,4 +1,8 @@
 const ADDON_ID = "cookietime@darktrojan.net";
+const ADDON_PREF_PAGE = "addons://detail/cookietime@darktrojan.net/preferences";
+
+const BROWSER_WINDOW_TYPE = "navigator:browser";
+const BROWSER_WINDOW_URL = "chrome://browser/content/browser.xul";
 
 const PREF_BRANCH = "extensions.cookietime.";
 const PREF_DELETE_EXPIRED_COUNT = "deleteExpired.count";
@@ -85,6 +89,82 @@ let idleObserver = {
 	}
 };
 
+let windowHandler = {
+	load: function() {
+		this.enumerateWindows(this.paint);
+		Services.ww.registerNotification(this);
+	},
+	unload: function(aReason) {
+		Services.ww.unregisterNotification(this);
+		if (aReason != APP_SHUTDOWN) {
+			this.enumerateWindows(this.unpaint);
+		}
+	},
+	enumerateWindows: function(aCallback) {
+		let windowEnum = Services.wm.getEnumerator(BROWSER_WINDOW_TYPE);
+		while (windowEnum.hasMoreElements()) {
+			aCallback(windowEnum.getNext());
+		}
+	},
+	observe: function(aSubject, aTopic, aData) {
+		if (aTopic == "domwindowopened") {
+			function onload() {
+				aSubject.removeEventListener("load", onload);
+				windowHandler.paint(aSubject);
+			}
+			aSubject.addEventListener("load", onload);
+		} else {
+			this.unpaint(aSubject);
+		}
+	},
+	paint: function(aWindow) {
+		if (aWindow.location.href != BROWSER_WINDOW_URL) {
+			return;
+		}
+
+		let document = aWindow.document;
+		let menuitem = document.createElement("menuitem");
+		menuitem.id = "tools-cookietime";
+		menuitem.className = "menuitem-iconic";
+		menuitem.setAttribute("label", strings.GetStringFromName("options.label"));
+		menuitem.addEventListener("command", function() {
+			windowHandler.openPreferences();
+		});
+
+		let toolsPopup = document.getElementById("menu_ToolsPopup");
+		toolsPopup.appendChild(menuitem);
+	},
+	unpaint: function(aWindow) {
+		if (aWindow.location.href != BROWSER_WINDOW_URL) {
+			return;
+		}
+
+		let document = aWindow.document;
+		document.getElementById("tools-cookietime").remove();
+	},
+	showConfigMessage: function(aIcon) {
+		let recentWindow = Services.wm.getMostRecentWindow(BROWSER_WINDOW_TYPE);
+		if (!recentWindow) {
+			return;
+		}
+
+		let label = strings.GetStringFromName("notification.label");
+		let value = "notify-cookietime";
+		let buttons = [{
+			label: strings.GetStringFromName("notification-button.label"),
+			accessKey: strings.GetStringFromName("notification-button.accesskey"),
+			callback: this.openPreferences
+		}];
+
+		let notifyBox = recentWindow.gBrowser.getNotificationBox();
+		notifyBox.appendNotification(label, value, aIcon, notifyBox.PRIORITY_INFO_LOW, buttons);
+	},
+	openPreferences: function() {
+		let browserWindow = Services.wm.getMostRecentWindow(BROWSER_WINDOW_TYPE);
+		browserWindow.BrowserOpenAddonsMgr(ADDON_PREF_PAGE);
+	}
+};
+
 function install(aParams, aReason) {
 }
 
@@ -101,16 +181,24 @@ function startup(aParams, aReason) {
 	defaultPrefs.setIntPref(PREF_EXPIRE_DAYS, 90);
 	defaultPrefs.setBoolPref(PREF_IDLE_ENABLED, false);
 
-	if (aReason = ADDON_INSTALL) {
-		// TODO show config UI
-	}
-
 	Services.obs.addObserver(optionsObserver, "addon-options-displayed", false);
 	Services.obs.addObserver(idleObserver, "idle-daily", false);
 	Services.obs.addObserver(idleObserver, "cookietime-idle", false);
+
+	windowHandler.load();
+
+	if (aReason == ADDON_INSTALL) {
+		windowHandler.showConfigMessage(aParams.resourceURI.spec + "icon.png");
+	}
 }
 
 function shutdown(aParams, aReason) {
+	windowHandler.unload(aReason);
+
+	if (aReason == APP_SHUTDOWN) {
+		return;
+	}
+
 	Services.obs.removeObserver(optionsObserver, "addon-options-displayed");
 	Services.obs.removeObserver(idleObserver, "idle-daily", false);
 	Services.obs.removeObserver(idleObserver, "cookietime-idle", false);
