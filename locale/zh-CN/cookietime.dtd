@@ -1,0 +1,21 @@
+<!ENTITY cookietime.deleteExpired.enabled-title "删除过期的 Cookie">
+<!ENTITY cookietime.deleteUnused.days-title "删除较长时间未使用的 Cookie">
+<!ENTITY cookietime.deleteUnused.days-nodelete "不删除">
+<!ENTITY cookietime.expire.days-title "所有 Cookie 的最长有效期">
+<!ENTITY cookietime.expire.days-nomodify "不修改">
+<!ENTITY cookietime.runnow.label "立即运行">
+<!ENTITY cookietime.idle.enabled-title "自动运行">
+<!ENTITY cookietime.idle.enabled-desc "每天闲置时运行一次">
+
+<!ENTITY cookietime.interval.7 "1 周">
+<!ENTITY cookietime.interval.14 "2 周">
+<!ENTITY cookietime.interval.30 "1 个月">
+<!ENTITY cookietime.interval.60 "2 个月">
+<!ENTITY cookietime.interval.91 "3 个月">
+<!ENTITY cookietime.interval.182 "6 个月">
+<!ENTITY cookietime.interval.273 "9 个月">
+<!ENTITY cookietime.interval.365 "12 个月">
+<!ENTITY cookietime.interval.547 "18 个月">
+<!ENTITY cookietime.interval.730 "2 年">
+<!ENTITY cookietime.interval.1095 "3 年">
+<!ENTITY cookietime.interval.1825 "5 年">
