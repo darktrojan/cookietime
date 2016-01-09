@@ -33,6 +33,14 @@
 				<em:description>Tel de tijd van cookies die u niet wilt of niet nodig heeft. Cookie Time verwijderd verlopen en ongebruikte cookies en stelt alle andere cookies in om te vervallen binnen een bepaald tijdvak.</em:description>
 			</Description>
 		</em:localized>
+
+		<em:localized>
+			<Description>
+				<em:locale>zh-CN</em:locale>
+				<em:name>Cookie Time</em:name>
+				<em:description>结束掉你不想要或者不需要的 Cookie。Cookie Time 会移除过期的和不想要的 Cookie，并且给所有 Cookie 设置一个合理的最长期限。</em:description>
+			</Description>
+		</em:localized>
 	</Description>
 
 </RDF>
