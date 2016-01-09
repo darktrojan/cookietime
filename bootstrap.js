@@ -1,3 +1,4 @@
+/* globals ADDON_INSTALL, APP_SHUTDOWN */
 const ADDON_ID = "cookietime@darktrojan.net";
 const ADDON_PREF_PAGE = "addons://detail/cookietime@darktrojan.net/preferences";
 
@@ -21,6 +22,7 @@ const US_IN_SECOND = 1000000;
 const DAY_INCREMENTS_SHORT = [7, 14, 30, 60, 91, 182, 273, 365, 547];
 const DAY_INCREMENTS_LONG = [7, 14, 30, 60, 91, 182, 273, 365, 547, 730, 1095, 1825];
 
+/* globals Components, Services, Sqlite, Task, PluralForm, XPCOMUtils */
 Components.utils.import("resource://gre/modules/Promise.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/Sqlite.jsm");
@@ -28,8 +30,13 @@ Components.utils.import("resource://gre/modules/Task.jsm");
 Components.utils.import("resource://gre/modules/PluralForm.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "strings", function() Services.strings.createBundle("chrome://cookietime/locale/cookietime.properties"));
-XPCOMUtils.defineLazyGetter(this, "getPlural", function() PluralForm.makeGetter(strings.GetStringFromName("pluralForm"))[0]);
+/* globals strings, getPlural */
+XPCOMUtils.defineLazyGetter(this, "strings", function() {
+	return Services.strings.createBundle("chrome://cookietime/locale/cookietime.properties");
+});
+XPCOMUtils.defineLazyGetter(this, "getPlural", function() {
+	return PluralForm.makeGetter(strings.GetStringFromName("pluralForm"))[0];
+});
 
 let optionsObserver = {
 	observe: function(aDocument, aTopic, aData) {
@@ -70,7 +77,7 @@ let optionsObserver = {
 };
 
 let idleObserver = {
-	observe: function(aSubject, aTopic, aData) {
+	observe: function(aSubject, aTopic) {
 		switch(aTopic) {
 		case "cookietime-idle":
 		case "idle-daily":
@@ -106,13 +113,12 @@ let windowHandler = {
 			aCallback(windowEnum.getNext());
 		}
 	},
-	observe: function(aSubject, aTopic, aData) {
+	observe: function(aSubject, aTopic) {
 		if (aTopic == "domwindowopened") {
-			function onload() {
+			aSubject.addEventListener("load", function onload() {
 				aSubject.removeEventListener("load", onload);
 				windowHandler.paint(aSubject);
-			}
-			aSubject.addEventListener("load", onload);
+			});
 		} else {
 			this.unpaint(aSubject);
 		}
@@ -156,7 +162,7 @@ let windowHandler = {
 			callback: this.openPreferences
 		}];
 
-		let notifyBox = recentWindow.gBrowser.getNotificationBox();
+		let notifyBox = recentWindow.document.getElementById("global-notificationbox");
 		notifyBox.appendNotification(label, value, aIcon, notifyBox.PRIORITY_INFO_LOW, buttons);
 	},
 	openPreferences: function() {
@@ -165,10 +171,11 @@ let windowHandler = {
 	}
 };
 
-function install(aParams, aReason) {
+/* exported install, uninstall, startup, shutdown */
+function install() {
 }
 
-function uninstall(aParams, aReason) {
+function uninstall() {
 }
 
 function startup(aParams, aReason) {
@@ -206,7 +213,7 @@ function shutdown(aParams, aReason) {
 
 function autoRunQueries() {
 	let deferred = Promise.defer();
-	Task.spawn(function() {
+	Task.spawn(function*() {
 		let deleteExpired = Services.prefs.getBoolPref(PREF_BRANCH + PREF_DELETE_EXPIRED_ENABLED);
 		let deleteUnusedDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_DELETE_UNUSED_DAYS);
 		let expireDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_EXPIRE_DAYS);
@@ -240,7 +247,7 @@ function autoRunQueries() {
 
 function countQueries() {
 	let deferred = Promise.defer();
-	Task.spawn(function() {
+	Task.spawn(function*() {
 		let connection = yield Sqlite.openConnection({ path: "cookies.sqlite" });
 		try {
 			let results = {
@@ -281,7 +288,7 @@ function countQueries() {
 
 function runQueries(aDeleteExpired, aDeleteUnusedDays, aExpireDays) {
 	let deferred = Promise.defer();
-	Task.spawn(function() {
+	Task.spawn(function*() {
 		let connection = yield Sqlite.openConnection({ path: "cookies.sqlite" });
 		try {
 			if (aDeleteExpired) {
