@@ -23,7 +23,6 @@ var DAY_INCREMENTS_SHORT = [7, 14, 30, 60, 91, 182, 273, 365, 547];
 var DAY_INCREMENTS_LONG = [7, 14, 30, 60, 91, 182, 273, 365, 547, 730, 1095, 1825];
 
 /* globals Components, Services, Sqlite, Task, PluralForm, XPCOMUtils */
-Components.utils.import('resource://gre/modules/Promise.jsm');
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import('resource://gre/modules/Sqlite.jsm');
 Components.utils.import('resource://gre/modules/Task.jsm');
@@ -212,8 +211,7 @@ function shutdown(aParams, aReason) {
 }
 
 function autoRunQueries() {
-	let deferred = Promise.defer();
-	Task.spawn(function*() {
+	return Task.spawn(function*() {
 		let deleteExpired = Services.prefs.getBoolPref(PREF_BRANCH + PREF_DELETE_EXPIRED_ENABLED);
 		let deleteUnusedDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_DELETE_UNUSED_DAYS);
 		let expireDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_EXPIRE_DAYS);
@@ -240,14 +238,12 @@ function autoRunQueries() {
 			result.expire = count.expire[expireDays];
 		}
 
-		deferred.resolve(result);
+		return result;
 	});
-	return deferred.promise;
 }
 
 function countQueries() {
-	let deferred = Promise.defer();
-	Task.spawn(function*() {
+	return Task.spawn(function*() {
 		let connection = yield Sqlite.openConnection({ path: 'cookies.sqlite' });
 		try {
 			let results = {
@@ -273,19 +269,15 @@ function countQueries() {
 					results.expire[days] = yield result[0].getResultByIndex(0);
 				}
 			}
-			deferred.resolve(results);
-		} catch (error) {
-			deferred.reject(error);
+			return results;
 		} finally {
 			yield connection.close();
 		}
 	});
-	return deferred.promise;
 }
 
 function runQueries(aDeleteExpired, aDeleteUnusedDays, aExpireDays) {
-	let deferred = Promise.defer();
-	Task.spawn(function*() {
+	return Task.spawn(function*() {
 		let connection = yield Sqlite.openConnection({ path: 'cookies.sqlite' });
 		try {
 			if (aDeleteExpired) {
@@ -302,14 +294,10 @@ function runQueries(aDeleteExpired, aDeleteUnusedDays, aExpireDays) {
 				let params = { s: aExpireDays * SECONDS_IN_DAY };
 				yield connection.execute(sql, params);
 			}
-			deferred.resolve();
-		} catch (error) {
-			deferred.reject(error);
 		} finally {
 			yield connection.close();
 		}
 	});
-	return deferred.promise;
 }
 
 function increaseCount(aPref, aCount) {
