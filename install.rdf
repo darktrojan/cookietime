@@ -36,6 +36,14 @@
 
 		<em:localized>
 			<Description>
+				<em:locale>ru</em:locale>
+				<em:name>Cookie Time</em:name>
+				<em:description>Удаляй куки которые тебе не нужны. Cookie Time стирает просроченные и неиспользованные куки, устанавливает их срок жизни.</em:description>
+			</Description>
+		</em:localized>
+
+		<em:localized>
+			<Description>
 				<em:locale>zh-CN</em:locale>
 				<em:name>Cookie Time</em:name>
 				<em:description>结束掉你不想要或者不需要的 Cookie。Cookie Time 会移除过期的和不想要的 Cookie，并且给所有 Cookie 设置一个合理的最长期限。</em:description>
