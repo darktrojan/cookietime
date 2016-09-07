@@ -3,18 +3,19 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>cookietime@darktrojan.net</em:id>
-		<em:version>6</em:version>
+		<em:version>7</em:version>
 		<em:type>2</em:type>
 		<em:bootstrap>true</em:bootstrap>
 		<em:name>Cookie Time</em:name>
 		<em:description>Call time on cookies you don't want or need. Cookie Time removes expired and unused cookies, and sets all other cookies to expire in a sensible timeframe.</em:description>
 		<em:creator>Geoff Lankow</em:creator>
+		<em:multiprocessCompatible>true</em:multiprocessCompatible>
 
 		<em:targetApplication>
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>43.0</em:minVersion>
-				<em:maxVersion>46.0a1</em:maxVersion>
+				<em:maxVersion>51.0a1</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
