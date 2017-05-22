@@ -182,9 +182,9 @@ function startup(aParams, aReason) {
 	defaultPrefs.setIntPref(PREF_DELETE_EXPIRED_COUNT, 0);
 	defaultPrefs.setBoolPref(PREF_DELETE_EXPIRED_ENABLED, true);
 	defaultPrefs.setIntPref(PREF_DELETE_UNUSED_COUNT, 0);
-	defaultPrefs.setIntPref(PREF_DELETE_UNUSED_DAYS, 90);
+	defaultPrefs.setIntPref(PREF_DELETE_UNUSED_DAYS, 91);
 	defaultPrefs.setIntPref(PREF_EXPIRE_COUNT, 0);
-	defaultPrefs.setIntPref(PREF_EXPIRE_DAYS, 90);
+	defaultPrefs.setIntPref(PREF_EXPIRE_DAYS, 91);
 	defaultPrefs.setBoolPref(PREF_IDLE_ENABLED, false);
 
 	Services.obs.addObserver(optionsObserver, 'addon-options-displayed', false);
@@ -216,26 +216,48 @@ function autoRunQueries() {
 		let deleteUnusedDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_DELETE_UNUSED_DAYS);
 		let expireDays = Services.prefs.getIntPref(PREF_BRANCH + PREF_EXPIRE_DAYS);
 
-		let count = yield countQueries();
-		yield runQueries(deleteExpired, deleteUnusedDays, expireDays);
-
+		let connection = yield Sqlite.openConnection({ path: 'cookies.sqlite' });
 		let result = {
 			deleteExpired: 0,
 			deleteUnused: 0,
 			expire: 0
 		};
 
-		if (deleteExpired) {
-			increaseCount(PREF_DELETE_EXPIRED_COUNT, count.deleteExpired);
-			result.deleteExpired = count.deleteExpired;
-		}
-		if (deleteUnusedDays) {
-			increaseCount(PREF_DELETE_UNUSED_COUNT, count.deleteUnused[deleteUnusedDays]);
-			result.deleteUnused = count.deleteUnused[deleteUnusedDays];
-		}
-		if (expireDays) {
-			increaseCount(PREF_EXPIRE_COUNT, count.expire[expireDays]);
-			result.expire = count.expire[expireDays];
+		try {
+			if (deleteExpired) {
+				let sql = 'DELETE FROM moz_cookies WHERE expiry < strftime(\'%s\', \'now\')';
+				yield connection.execute(sql);
+
+				let countQuery = yield connection.execute('SELECT changes()');
+				let count = countQuery[0].getResultByIndex(0);
+
+				increaseCount(PREF_DELETE_EXPIRED_COUNT, count);
+				result.deleteExpired = count;
+			}
+			if (deleteUnusedDays > 0) {
+				let sql = 'DELETE FROM moz_cookies WHERE lastAccessed < strftime(\'%s000000\', \'now\') - :us';
+				let params = { us: deleteUnusedDays * SECONDS_IN_DAY * US_IN_SECOND };
+				yield connection.execute(sql, params);
+
+				let countQuery = yield connection.execute('SELECT changes()');
+				let count = countQuery[0].getResultByIndex(0);
+
+				increaseCount(PREF_DELETE_UNUSED_COUNT, count);
+				result.deleteUnused = count;
+			}
+			if (expireDays > 0) {
+				let sql = 'UPDATE moz_cookies SET expiry = MIN(strftime(\'%s\', \'now\') + :s, expiry)';
+				let params = { s: expireDays * SECONDS_IN_DAY };
+				yield connection.execute(sql, params);
+
+				let countQuery = yield connection.execute('SELECT changes()');
+				let count = countQuery[0].getResultByIndex(0);
+
+				increaseCount(PREF_EXPIRE_COUNT, count);
+				result.expire = count;
+			}
+		} finally {
+			yield connection.close();
 		}
 
 		return result;
@@ -270,30 +292,6 @@ function countQueries() {
 				}
 			}
 			return results;
-		} finally {
-			yield connection.close();
-		}
-	});
-}
-
-function runQueries(aDeleteExpired, aDeleteUnusedDays, aExpireDays) {
-	return Task.spawn(function*() {
-		let connection = yield Sqlite.openConnection({ path: 'cookies.sqlite' });
-		try {
-			if (aDeleteExpired) {
-				let sql = 'DELETE FROM moz_cookies WHERE expiry < strftime(\'%s\', \'now\')';
-				yield connection.execute(sql);
-			}
-			if (aDeleteUnusedDays > 0) {
-				let sql = 'DELETE FROM moz_cookies WHERE lastAccessed < strftime(\'%s000000\', \'now\') - :us';
-				let params = { us: aDeleteUnusedDays * SECONDS_IN_DAY * US_IN_SECOND };
-				yield connection.execute(sql, params);
-			}
-			if (aExpireDays > 0) {
-				let sql = 'UPDATE moz_cookies SET expiry = MIN(strftime(\'%s\', \'now\') + :s, expiry)';
-				let params = { s: aExpireDays * SECONDS_IN_DAY };
-				yield connection.execute(sql, params);
-			}
 		} finally {
 			yield connection.close();
 		}
